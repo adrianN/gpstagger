@@ -2,11 +2,6 @@ import gpxpy
 from bisect import bisect
 import datetime as dt
 
-DEBUG = False
-def debug_print(message):
-	if DEBUG:
-		print message
-
 class PositionLookup(object):
 	def __init__(self, filenames):
 		self._build_lookup(filenames)
