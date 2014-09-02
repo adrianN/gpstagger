@@ -19,19 +19,27 @@ class PositionLookup(object):
 
 	def lookup(self, time, time_cutoff=None):
 		""" Returns the closest point to the given time. If the time difference is larger than
-		    time_cutoff, return None.
+		    time_cutoff (that should be a timedelta object), return None.
 		"""
 		#do a binary search over the point set, comparing times
 		pos = bisect(self.times, time)
-
+		position = None
 		if pos > 0 and (time - self.times[pos-1]) < (self.times[pos]-time):
 			#check which of the two adjacent times is closer to time
-			return self.points[pos-1]
-		return self.points[pos] if pos<self.point_count else self.points[pos-1]
+			position = self.points[pos-1]
+		else:
+			position = self.points[pos] if pos<self.point_count else self.points[pos-1]
+
+		if time_cutoff is None or abs(position.time - time) <= time_cutoff:
+			return position
+		return None
+
 
 if __name__ == "__main__":
 	pos = PositionLookup(["./tests/track.gpx"])
-	time = dt.datetime(2014, 3, 4, 13,1,9)
+	time = dt.datetime(2014, 3, 4, 13,1,3)
+	tdelta = dt.timedelta(seconds=5)
 	for p in pos.points: print p
 	print "closest point to", time
 	print pos.lookup(time)
+	print pos.lookup(time, tdelta)
