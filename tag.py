@@ -2,7 +2,7 @@ from shottime import get_shot_time
 from gpx import PositionLookup
 from pexif import JpegFile
 from pytz import utc
-
+import sys
 
 def gps_tag_photo(jpg, position_lookup, jpg_tz, time_cutoff=None):
 	""" Adds gps information to the jpg using the position lookup structure.
@@ -16,8 +16,10 @@ def gps_tag_photo(jpg, position_lookup, jpg_tz, time_cutoff=None):
 	return jpg
 
 def tag_all_photos(jpg_filenames, gpx_filenames, jpg_tz=utc, gpx_tz=utc, time_cutoff=None):
-	print "Parsing GPX data"
+	print "Parsing GPX data...",
+	sys.stdout.flush()
 	position_lookup = PositionLookup(gpx_filenames, gpx_tz)
+	print "   ", position_lookup.point_count, "points read"
 	jpegs = []
 	for jpgname in jpg_filenames:
 		print "Tagging", jpgname
