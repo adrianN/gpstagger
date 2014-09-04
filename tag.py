@@ -1,12 +1,13 @@
 from shottime import get_shot_time
 from gpx import PositionLookup
 from pexif import JpegFile
+from pytz import utc
 
 
-def gps_tag_photo(jpg, position_lookup, time_cutoff=None):
+def gps_tag_photo(jpg, position_lookup, jpg_tz, time_cutoff=None):
 	""" Adds gps information to the jpg using the position lookup structure.
 	    Does not save the jpg, returns it instead """
-	shot_time = get_shot_time(jpg)
+	shot_time = get_shot_time(jpg, jpg_tz)
 	print "Picture taken", shot_time
 	position = position_lookup.lookup(shot_time, time_cutoff)
 	print "position", position
@@ -14,13 +15,13 @@ def gps_tag_photo(jpg, position_lookup, time_cutoff=None):
 
 	return jpg
 
-def tag_all_photos(photo_filenames, gpx_filenames, time_cutoff=None):
+def tag_all_photos(jpg_filenames, gpx_filenames, jpg_tz=utc, gpx_tz=utc, time_cutoff=None):
 	print "Parsing GPX data"
-	position_lookup = PositionLookup(gpx_filenames)
+	position_lookup = PositionLookup(gpx_filenames, gpx_tz)
 	jpegs = []
-	for jpgname in photo_filenames:
+	for jpgname in jpg_filenames:
 		print "Tagging", jpgname
 		jpg = JpegFile.fromFile(jpgname)
-		jpg = gps_tag_photo(jpg, position_lookup, time_cutoff)
+		jpg = gps_tag_photo(jpg, position_lookup, jpg_tz, time_cutoff)
 		jpegs.append(jpg)
 	return jpegs
