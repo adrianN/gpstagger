@@ -25,11 +25,13 @@ class PositionLookup(object):
 		#do a binary search over the point set, comparing times
 		pos = bisect(self.times, time)
 		position = None
-		if pos > 0 and (time - self.times[pos-1]) < (self.times[pos]-time):
+		if pos==self.point_count:
+			position = self.points[pos-1]
+		elif pos>0 and (time - self.times[pos-1]) < (self.times[pos]-time):
 			#check which of the two adjacent times is closer to time
 			position = self.points[pos-1]
 		else:
-			position = self.points[pos] if pos<self.point_count else self.points[pos-1]
+			position = self.points[pos]
 
 		if time_cutoff is None or abs(position.time - time) <= time_cutoff:
 			return position
