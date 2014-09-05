@@ -57,22 +57,26 @@ def lcs(X, Y):
                 C[i][j] = max(C[i][j-1], C[i-1][j])
     return C[m][n]
 
-args = get_args()
+if __name__=="__main__":
+	args = get_args()
 
-try:
-	gpxfiles, jpegfiles = get_files(args)
-except OSError as e:
-	print >> sys.stderr, "I can't open those directories\n\t", e
-	exit(1)
+	try:
+		gpxfiles, jpegfiles = get_files(args)
+	except OSError as e:
+		print >> sys.stderr, "I can't open those directories\n\t", e
+		exit(1)
 
-try:
-	gpxtime, jpgtime = get_timezones(args)
-except LookupError as e:
-	print "I don't understand the timezone", e.args[0]
-	print "Did you mean", list(reversed(sorted(pytz.common_timezones, key=lambda s:lcs(e.args[0],s))[-3:])), "?"
-	exit(1)
+	try:
+		gpxtime, jpgtime = get_timezones(args)
+	except LookupError as e:
+		print "I don't understand the timezone", e.args[0]
+		print "Did you mean", list(reversed(sorted(pytz.common_timezones, key=lambda s:lcs(e.args[0],s))[-3:])), "?"
+		exit(1)
 
 
-jpgs = tag.tag_all_photos(jpegfiles, gpxfiles, jpgtime, gpxtime)
-for jpg in jpgs:
-	jpg.writeFile(jpg.filename[:jpg.filename.rfind('.')]+'_gps.jpg')
+	jpgs = tag.tag_all_photos(jpegfiles, gpxfiles, jpgtime, gpxtime)
+	for jpg in jpgs:
+		if not args.inplace:
+			jpg.writeFile(jpg.filename[:jpg.filename.rfind('.')]+'_gps.jpg')
+		else:
+			jpg.writeFile(jpg.filename)
